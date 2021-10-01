@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { Image } from '../../models/image';
 import { GalleryApi } from '../../providers';
+import { ChangeDetectorRef } from '@angular/core'
 
 @Component({
   selector: 'page-home',
@@ -10,7 +11,7 @@ import { GalleryApi } from '../../providers';
 export class HomePage {
   public currentImages: Image[];
 
-  constructor(public navCtrl: NavController, private galleryApi: GalleryApi) {
+  constructor(public navCtrl: NavController, private galleryApi: GalleryApi, private changeRef: ChangeDetectorRef) {
     this.loadImages();
   }
 
@@ -24,9 +25,9 @@ export class HomePage {
   }
 
   loadMore() {
-    console.log('loadmore');
     this.galleryApi.get().subscribe((res: any) => {
       this.currentImages = [...this.currentImages, ...res.pugs];
+      console.log(this.currentImages.length);
     });
   }
 
@@ -35,15 +36,14 @@ export class HomePage {
   }
 
   async detectScrolling(event? : any) {
-    console.log(event);
     const scrollElement = event.scrollElement;
     const scrollHeight = scrollElement.scrollHeight;
     const currentScrollDepth = event.scrollTop;
-    const targetPercent = 80;
+    const targetPercent = 60;
     let triggerDepth = ((scrollHeight / 100) * targetPercent);
-    console.log(currentScrollDepth, triggerDepth);
     if(currentScrollDepth > triggerDepth) {
       this.loadMore();
+      this.changeRef.detectChanges();
     }
   }
 
